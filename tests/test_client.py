@@ -32,10 +32,11 @@ class FakeResponse:
 def patch_urlopen(text, status=200):
     captured = {}
 
-    def fake_urlopen(request, timeout=None):
+    def fake_urlopen(request, timeout=None, context=None):
         captured["url"] = request.full_url
         captured["body"] = json.loads(request.data.decode("utf-8"))
         captured["timeout"] = timeout
+        captured["context"] = context
         return FakeResponse(text, status)
 
     return mock.patch("urllib.request.urlopen", fake_urlopen), captured

@@ -2,6 +2,7 @@
 
 import json
 import os
+import ssl
 import urllib.error
 import urllib.request
 from typing import Any, Dict, List, Optional
@@ -12,6 +13,22 @@ from .models import CreditsResponse, FeedbackResponse, ImageResponse, VideoRespo
 DEFAULT_BASE_URL = "https://app.pedra.ai/api"
 # createVideo blocks server-side until the video is rendered (up to ~10 min).
 DEFAULT_TIMEOUT = 600.0
+
+
+def _build_ssl_context() -> ssl.SSLContext:
+    """Build a TLS context backed by certifi's CA bundle.
+
+    Stock python.org builds on macOS (and some minimal Linux images) ship no
+    trusted-root bundle, so ``urllib`` raises ``CERTIFICATE_VERIFY_FAILED`` for
+    every HTTPS request. Pinning certifi makes the client work out of the box.
+    If certifi is somehow missing, fall back to the system default context.
+    """
+    try:
+        import certifi
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
 
 
 def _to_camel(key: str) -> str:
@@ -70,6 +87,7 @@ class Pedra:
         self.api_key = key
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self._ssl_context = _build_ssl_context()
 
     # --- endpoints -----------------------------------------------------------
 
@@ -257,7 +275,9 @@ class Pedra:
         )
 
         try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+            with urllib.request.urlopen(
+                request, timeout=self.timeout, context=self._ssl_context
+            ) as response:
                 status = response.getcode()
                 text = response.read().decode("utf-8")
         except urllib.error.HTTPError as err:  # non-2xx
