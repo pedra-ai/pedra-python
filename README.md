@@ -75,6 +75,14 @@ class ImageResponse:
 | `remove(image_url, mask_url)` | `/remove_object` | `ImageResponse` |
 | `blur(image_url, objects_to_blur)` | `/blur` | `ImageResponse` |
 | `create_video(images, *, music=None, voice=None, branding=None, ending_title=None, ending_subtitle=None, is_vertical=None, property_characteristics=None)` | `/create_video` | `VideoResponse` |
+| `update_video(video_id, *, images=None, music=None, voice=None, branding=None, ending_title=None, ending_subtitle=None, is_vertical=None, property_characteristics=None)` | `/update_video` | `VideoResponse` |
+| `generate_voice_script(*, images=None, property_characteristics=None, language=None)` | `/generate_voice_script` | `ScriptResponse` |
+| `generate_voice(text, *, language=None)` | `/generate_voice` | `VoiceResponse` |
+| `music_library()` | `/music_library` | `MusicLibraryResponse` |
+| `list_properties()` | `/list_properties` | `PropertiesResponse` |
+| `list_property_images(property_id)` | `/list_property_images` | `PropertyImagesResponse` |
+| `create_property(*, name=None)` | `/create_property` | `PropertyResponse` |
+| `add_images_to_property(property_id, image_urls)` | `/add_images_to_property` | `AddImagesResponse` |
 | `credits()` | `/credits` | `CreditsResponse` |
 | `feedback(*, image_url=None, image_id=None, vote=None, comment=None, credit_back=None)` | `/feedback` | `FeedbackResponse` |
 
