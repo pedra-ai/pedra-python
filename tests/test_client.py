@@ -112,6 +112,111 @@ class ClientTests(unittest.TestCase):
         self.assertTrue(captured["body"]["isVertical"])
         self.assertEqual(res.video_url, "https://v/1")
 
+    def test_update_video_camelizes_and_targets_endpoint(self):
+        patcher, captured = patch_urlopen(
+            json.dumps({"videoId": "v1", "videoUrl": "https://v/2"})
+        )
+        with patcher:
+            res = Pedra("k").update_video(
+                "v1",
+                music={"track": "cinematic"},
+                voice={"audio_id": "a1", "show_subtitles": False},
+            )
+        self.assertEqual(captured["url"], "https://app.pedra.ai/api/update_video")
+        self.assertEqual(captured["body"]["videoId"], "v1")
+        self.assertEqual(captured["body"]["voice"]["audioId"], "a1")
+        self.assertFalse(captured["body"]["voice"]["showSubtitles"])
+        # images omitted → patch-style metadata edit
+        self.assertNotIn("images", captured["body"])
+        self.assertEqual(res.video_url, "https://v/2")
+
+    def test_generate_voice(self):
+        patcher, captured = patch_urlopen(
+            json.dumps(
+                {"audioId": "a1", "audioUrl": "https://aud/1", "duration": 7}
+            )
+        )
+        with patcher:
+            res = Pedra("k").generate_voice("A bright home.", language="Español")
+        self.assertEqual(captured["url"], "https://app.pedra.ai/api/generate_voice")
+        self.assertEqual(captured["body"]["text"], "A bright home.")
+        self.assertEqual(captured["body"]["language"], "Español")
+        self.assertEqual(res.audio_id, "a1")
+        self.assertEqual(res.duration, 7)
+
+    def test_generate_voice_script(self):
+        patcher, captured = patch_urlopen(json.dumps({"script": "Lovely place."}))
+        with patcher:
+            res = Pedra("k").generate_voice_script(
+                images=["https://a"],
+                property_characteristics=[{"label": "Bedrooms", "value": "3"}],
+            )
+        self.assertEqual(
+            captured["url"], "https://app.pedra.ai/api/generate_voice_script"
+        )
+        self.assertEqual(captured["body"]["images"], ["https://a"])
+        self.assertEqual(
+            captured["body"]["propertyCharacteristics"][0]["label"], "Bedrooms"
+        )
+        self.assertEqual(res.script, "Lovely place.")
+
+    def test_music_library(self):
+        patcher, _ = patch_urlopen(
+            json.dumps(
+                {
+                    "tracks": [{"track": "chill", "label": "Chill Beats"}],
+                    "variantsPerTrack": 6,
+                    "defaultTrack": "chill",
+                    "voiceLanguages": ["English"],
+                }
+            )
+        )
+        with patcher:
+            res = Pedra("k").music_library()
+        self.assertEqual(res.default_track, "chill")
+        self.assertEqual(res.variants_per_track, 6)
+        self.assertEqual(res.tracks[0]["track"], "chill")
+
+    def test_list_projects(self):
+        patcher, captured = patch_urlopen(
+            json.dumps({"projects": [{"projectId": "p1", "name": "Listing", "photoCount": 3}]})
+        )
+        with patcher:
+            res = Pedra("k").list_projects()
+        self.assertEqual(captured["url"], "https://app.pedra.ai/api/list_projects")
+        self.assertEqual(res.projects[0]["projectId"], "p1")
+
+    def test_list_project_images(self):
+        patcher, captured = patch_urlopen(
+            json.dumps({"projectId": "p1", "images": [{"imageId": "i1", "url": "https://img.pedra.ai/i1"}]})
+        )
+        with patcher:
+            res = Pedra("k").list_project_images("p1")
+        self.assertEqual(captured["body"]["projectId"], "p1")
+        self.assertEqual(res.images[0]["url"], "https://img.pedra.ai/i1")
+
+    def test_create_project(self):
+        patcher, captured = patch_urlopen(
+            json.dumps({"message": "Project created", "projectId": "p2", "appUrl": "https://app.pedra.ai/?projectId=p2"})
+        )
+        with patcher:
+            res = Pedra("k").create_project(name="New listing")
+        self.assertEqual(captured["url"], "https://app.pedra.ai/api/create_project")
+        self.assertEqual(captured["body"]["name"], "New listing")
+        self.assertEqual(res.project_id, "p2")
+        self.assertIn("projectId=p2", res.app_url)
+
+    def test_add_images_to_project_camelizes(self):
+        patcher, captured = patch_urlopen(
+            json.dumps({"message": "Added 1 image(s)", "projectId": "p1", "added": [{"imageId": "i9", "url": "https://img.pedra.ai/i9"}], "failed": []})
+        )
+        with patcher:
+            res = Pedra("k").add_images_to_project("p1", ["https://x/a.jpg"])
+        self.assertEqual(captured["url"], "https://app.pedra.ai/api/add_images_to_project")
+        self.assertEqual(captured["body"]["projectId"], "p1")
+        self.assertEqual(captured["body"]["imageUrls"], ["https://x/a.jpg"])
+        self.assertEqual(res.added[0]["url"], "https://img.pedra.ai/i9")
+
 
 class CamelizeTests(unittest.TestCase):
     def test_to_camel_keys_only(self):

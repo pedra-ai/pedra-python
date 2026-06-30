@@ -9,10 +9,17 @@
 from .client import Pedra
 from .errors import PedraAPIError, PedraError
 from .models import (
+    AddImagesResponse,
     CreditsResponse,
     FeedbackResponse,
     ImageResponse,
+    MusicLibraryResponse,
+    ProjectImagesResponse,
+    ProjectResponse,
+    ProjectsResponse,
+    ScriptResponse,
     VideoResponse,
+    VoiceResponse,
 )
 
 __version__ = "0.1.1"
@@ -25,5 +32,12 @@ __all__ = [
     "VideoResponse",
     "CreditsResponse",
     "FeedbackResponse",
+    "ScriptResponse",
+    "VoiceResponse",
+    "MusicLibraryResponse",
+    "ProjectsResponse",
+    "ProjectImagesResponse",
+    "ProjectResponse",
+    "AddImagesResponse",
     "__version__",
 ]

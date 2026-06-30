@@ -8,7 +8,19 @@ import urllib.request
 from typing import Any, Dict, List, Optional
 
 from .errors import PedraAPIError, PedraError
-from .models import CreditsResponse, FeedbackResponse, ImageResponse, VideoResponse
+from .models import (
+    AddImagesResponse,
+    CreditsResponse,
+    FeedbackResponse,
+    ImageResponse,
+    MusicLibraryResponse,
+    ProjectImagesResponse,
+    ProjectResponse,
+    ProjectsResponse,
+    ScriptResponse,
+    VideoResponse,
+    VoiceResponse,
+)
 
 DEFAULT_BASE_URL = "https://app.pedra.ai/api"
 # createVideo blocks server-side until the video is rendered (up to ~10 min).
@@ -218,6 +230,149 @@ class Pedra:
             message=data.get("message"),
             video_id=data.get("videoId", ""),
             video_url=data.get("videoUrl", ""),
+            raw=data,
+        )
+
+    def update_video(
+        self,
+        video_id: str,
+        *,
+        images: Optional[List[Dict[str, Any]]] = None,
+        music: Optional[Dict[str, Any]] = None,
+        voice: Optional[Dict[str, Any]] = None,
+        branding: Optional[Dict[str, Any]] = None,
+        ending_title: Optional[str] = None,
+        ending_subtitle: Optional[str] = None,
+        is_vertical: Optional[bool] = None,
+        property_characteristics: Optional[List[Dict[str, Any]]] = None,
+    ) -> VideoResponse:
+        """Edit an existing video without re-rendering unchanged clips.
+
+        Only new/changed photos re-animate (and cost credits); reordering,
+        music, voice, branding and text re-stitch for free. Omit ``images`` to
+        change only audio/text/branding while keeping the timeline; omit
+        ``music``/``voice``/``branding``/ending text to leave them unchanged.
+        Blocks until rendered and returns the new video URL. (``/update_video``)
+        """
+        data = self._post(
+            "/update_video",
+            video_id=video_id,
+            images=images,
+            music=music,
+            voice=voice,
+            branding=branding,
+            ending_title=ending_title,
+            ending_subtitle=ending_subtitle,
+            is_vertical=is_vertical,
+            property_characteristics=property_characteristics,
+        )
+        return VideoResponse(
+            message=data.get("message"),
+            video_id=data.get("videoId", video_id),
+            video_url=data.get("videoUrl", ""),
+            raw=data,
+        )
+
+    def generate_voice_script(
+        self,
+        *,
+        images: Optional[List[Any]] = None,
+        property_characteristics: Optional[List[Dict[str, Any]]] = None,
+        language: Optional[str] = None,
+    ) -> ScriptResponse:
+        """Write a voiceover script from photos (and optional property facts).
+
+        GPT-4o vision reads the images so the script reflects what's shown.
+        ``images`` accepts URL strings or ``{"image_url": ...}`` dicts. Feed the
+        result to :meth:`generate_voice`. (``/generate_voice_script``)
+        """
+        data = self._post(
+            "/generate_voice_script",
+            images=images,
+            property_characteristics=property_characteristics,
+            language=language,
+        )
+        return ScriptResponse(
+            message=data.get("message"),
+            script=data.get("script", ""),
+            raw=data,
+        )
+
+    def generate_voice(
+        self, text: str, *, language: Optional[str] = None
+    ) -> VoiceResponse:
+        """Render a voiceover from a script via TTS.
+
+        Returns an ``audio_id`` to pass as a video's ``voice={"audio_id": ...}``
+        (which also drives synced subtitles). (``/generate_voice``)
+        """
+        data = self._post("/generate_voice", text=text, language=language)
+        return VoiceResponse(
+            message=data.get("message"),
+            audio_id=data.get("audioId", ""),
+            audio_url=data.get("audioUrl", ""),
+            alignment_url=data.get("alignmentUrl"),
+            duration=data.get("duration"),
+            raw=data,
+        )
+
+    def music_library(self) -> MusicLibraryResponse:
+        """List the background-music catalog and voice languages. Read-only.
+
+        Returns the valid ``music`` ``track`` values (genre keys) with labels.
+        (``/music_library``)
+        """
+        data = self._post("/music_library")
+        return MusicLibraryResponse(
+            tracks=data.get("tracks", []),
+            variants_per_track=int(data.get("variantsPerTrack", 0) or 0),
+            default_track=data.get("defaultTrack", ""),
+            voice_languages=data.get("voiceLanguages", []),
+            raw=data,
+        )
+
+    def list_projects(self) -> ProjectsResponse:
+        """List the account's projects (id, name, photo count, appUrl). Use it to
+        find photos already in the account. (``/list_projects``)"""
+        data = self._post("/list_projects")
+        return ProjectsResponse(projects=data.get("projects", []), raw=data)
+
+    def list_project_images(self, project_id: str) -> ProjectImagesResponse:
+        """List a project's photos as public URLs, ready to pass to
+        :meth:`create_video` or the edit methods. (``/list_project_images``)"""
+        data = self._post("/list_project_images", project_id=project_id)
+        return ProjectImagesResponse(
+            project_id=data.get("projectId", project_id),
+            name=data.get("name"),
+            images=data.get("images", []),
+            raw=data,
+        )
+
+    def create_project(self, *, name: Optional[str] = None) -> ProjectResponse:
+        """Create a project. Returns its id and an ``app_url`` to open it in Pedra
+        (the way to add brand-new local photos). (``/create_project``)"""
+        data = self._post("/create_project", name=name)
+        return ProjectResponse(
+            message=data.get("message"),
+            project_id=data.get("projectId", ""),
+            app_url=data.get("appUrl"),
+            raw=data,
+        )
+
+    def add_images_to_project(
+        self, project_id: str, image_urls: List[str]
+    ) -> AddImagesResponse:
+        """Add photos to a project by URL — the server fetches and stores each one,
+        so any public https image URL works. (``/add_images_to_project``)"""
+        data = self._post(
+            "/add_images_to_project", project_id=project_id, image_urls=image_urls
+        )
+        return AddImagesResponse(
+            message=data.get("message"),
+            project_id=data.get("projectId", project_id),
+            added=data.get("added", []),
+            failed=data.get("failed", []),
+            app_url=data.get("appUrl"),
             raw=data,
         )
 
