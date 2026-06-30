@@ -177,43 +177,43 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(res.variants_per_track, 6)
         self.assertEqual(res.tracks[0]["track"], "chill")
 
-    def test_list_projects(self):
+    def test_list_properties(self):
         patcher, captured = patch_urlopen(
-            json.dumps({"projects": [{"projectId": "p1", "name": "Listing", "photoCount": 3}]})
+            json.dumps({"properties": [{"propertyId": "p1", "name": "Listing", "photoCount": 3}]})
         )
         with patcher:
-            res = Pedra("k").list_projects()
-        self.assertEqual(captured["url"], "https://app.pedra.ai/api/list_projects")
-        self.assertEqual(res.projects[0]["projectId"], "p1")
+            res = Pedra("k").list_properties()
+        self.assertEqual(captured["url"], "https://app.pedra.ai/api/list_properties")
+        self.assertEqual(res.properties[0]["propertyId"], "p1")
 
-    def test_list_project_images(self):
+    def test_list_property_images(self):
         patcher, captured = patch_urlopen(
-            json.dumps({"projectId": "p1", "images": [{"imageId": "i1", "url": "https://img.pedra.ai/i1"}]})
+            json.dumps({"propertyId": "p1", "images": [{"imageId": "i1", "url": "https://img.pedra.ai/i1"}]})
         )
         with patcher:
-            res = Pedra("k").list_project_images("p1")
-        self.assertEqual(captured["body"]["projectId"], "p1")
+            res = Pedra("k").list_property_images("p1")
+        self.assertEqual(captured["body"]["propertyId"], "p1")
         self.assertEqual(res.images[0]["url"], "https://img.pedra.ai/i1")
 
-    def test_create_project(self):
+    def test_create_property(self):
         patcher, captured = patch_urlopen(
-            json.dumps({"message": "Project created", "projectId": "p2", "appUrl": "https://app.pedra.ai/?projectId=p2"})
+            json.dumps({"message": "Property created", "propertyId": "p2", "appUrl": "https://app.pedra.ai/?propertyId=p2"})
         )
         with patcher:
-            res = Pedra("k").create_project(name="New listing")
-        self.assertEqual(captured["url"], "https://app.pedra.ai/api/create_project")
+            res = Pedra("k").create_property(name="New listing")
+        self.assertEqual(captured["url"], "https://app.pedra.ai/api/create_property")
         self.assertEqual(captured["body"]["name"], "New listing")
-        self.assertEqual(res.project_id, "p2")
-        self.assertIn("projectId=p2", res.app_url)
+        self.assertEqual(res.property_id, "p2")
+        self.assertIn("propertyId=p2", res.app_url)
 
-    def test_add_images_to_project_camelizes(self):
+    def test_add_images_to_property_camelizes(self):
         patcher, captured = patch_urlopen(
-            json.dumps({"message": "Added 1 image(s)", "projectId": "p1", "added": [{"imageId": "i9", "url": "https://img.pedra.ai/i9"}], "failed": []})
+            json.dumps({"message": "Added 1 image(s)", "propertyId": "p1", "added": [{"imageId": "i9", "url": "https://img.pedra.ai/i9"}], "failed": []})
         )
         with patcher:
-            res = Pedra("k").add_images_to_project("p1", ["https://x/a.jpg"])
-        self.assertEqual(captured["url"], "https://app.pedra.ai/api/add_images_to_project")
-        self.assertEqual(captured["body"]["projectId"], "p1")
+            res = Pedra("k").add_images_to_property("p1", ["https://x/a.jpg"])
+        self.assertEqual(captured["url"], "https://app.pedra.ai/api/add_images_to_property")
+        self.assertEqual(captured["body"]["propertyId"], "p1")
         self.assertEqual(captured["body"]["imageUrls"], ["https://x/a.jpg"])
         self.assertEqual(res.added[0]["url"], "https://img.pedra.ai/i9")
 

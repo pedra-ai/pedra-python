@@ -14,9 +14,9 @@ from .models import (
     FeedbackResponse,
     ImageResponse,
     MusicLibraryResponse,
-    ProjectImagesResponse,
-    ProjectResponse,
-    ProjectsResponse,
+    PropertyImagesResponse,
+    PropertyResponse,
+    PropertiesResponse,
     ScriptResponse,
     VideoResponse,
     VoiceResponse,
@@ -331,45 +331,45 @@ class Pedra:
             raw=data,
         )
 
-    def list_projects(self) -> ProjectsResponse:
-        """List the account's projects (id, name, photo count, appUrl). Use it to
-        find photos already in the account. (``/list_projects``)"""
-        data = self._post("/list_projects")
-        return ProjectsResponse(projects=data.get("projects", []), raw=data)
+    def list_properties(self) -> PropertiesResponse:
+        """List the account's properties (id, name, photo count, appUrl). Use it to
+        find photos already in the account. (``/list_properties``)"""
+        data = self._post("/list_properties")
+        return PropertiesResponse(properties=data.get("properties", []), raw=data)
 
-    def list_project_images(self, project_id: str) -> ProjectImagesResponse:
-        """List a project's photos as public URLs, ready to pass to
-        :meth:`create_video` or the edit methods. (``/list_project_images``)"""
-        data = self._post("/list_project_images", project_id=project_id)
-        return ProjectImagesResponse(
-            project_id=data.get("projectId", project_id),
+    def list_property_images(self, property_id: str) -> PropertyImagesResponse:
+        """List a property's photos as public URLs, ready to pass to
+        :meth:`create_video` or the edit methods. (``/list_property_images``)"""
+        data = self._post("/list_property_images", property_id=property_id)
+        return PropertyImagesResponse(
+            property_id=data.get("propertyId", property_id),
             name=data.get("name"),
             images=data.get("images", []),
             raw=data,
         )
 
-    def create_project(self, *, name: Optional[str] = None) -> ProjectResponse:
-        """Create a project. Returns its id and an ``app_url`` to open it in Pedra
-        (the way to add brand-new local photos). (``/create_project``)"""
-        data = self._post("/create_project", name=name)
-        return ProjectResponse(
+    def create_property(self, *, name: Optional[str] = None) -> PropertyResponse:
+        """Create a property. Returns its id and an ``app_url`` to open it in Pedra
+        (the way to add brand-new local photos). (``/create_property``)"""
+        data = self._post("/create_property", name=name)
+        return PropertyResponse(
             message=data.get("message"),
-            project_id=data.get("projectId", ""),
+            property_id=data.get("propertyId", ""),
             app_url=data.get("appUrl"),
             raw=data,
         )
 
-    def add_images_to_project(
-        self, project_id: str, image_urls: List[str]
+    def add_images_to_property(
+        self, property_id: str, image_urls: List[str]
     ) -> AddImagesResponse:
-        """Add photos to a project by URL — the server fetches and stores each one,
-        so any public https image URL works. (``/add_images_to_project``)"""
+        """Add photos to a property by URL — the server fetches and stores each one,
+        so any public https image URL works. (``/add_images_to_property``)"""
         data = self._post(
-            "/add_images_to_project", project_id=project_id, image_urls=image_urls
+            "/add_images_to_property", property_id=property_id, image_urls=image_urls
         )
         return AddImagesResponse(
             message=data.get("message"),
-            project_id=data.get("projectId", project_id),
+            property_id=data.get("propertyId", property_id),
             added=data.get("added", []),
             failed=data.get("failed", []),
             app_url=data.get("appUrl"),

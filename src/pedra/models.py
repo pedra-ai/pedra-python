@@ -72,23 +72,23 @@ class MusicLibraryResponse:
 
 
 @dataclass
-class ProjectsResponse:
-    projects: List[Any]
+class PropertiesResponse:
+    properties: List[Any]
     raw: Any = field(repr=False, default=None)
 
 
 @dataclass
-class ProjectImagesResponse:
-    project_id: str
+class PropertyImagesResponse:
+    property_id: str
     name: Optional[str]
     images: List[Any]
     raw: Any = field(repr=False, default=None)
 
 
 @dataclass
-class ProjectResponse:
+class PropertyResponse:
     message: Optional[str]
-    project_id: str
+    property_id: str
     app_url: Optional[str] = None
     raw: Any = field(repr=False, default=None)
 
@@ -96,7 +96,7 @@ class ProjectResponse:
 @dataclass
 class AddImagesResponse:
     message: Optional[str]
-    project_id: str
+    property_id: str
     added: List[Any]
     failed: List[Any]
     app_url: Optional[str] = None

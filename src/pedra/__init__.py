@@ -14,15 +14,15 @@ from .models import (
     FeedbackResponse,
     ImageResponse,
     MusicLibraryResponse,
-    ProjectImagesResponse,
-    ProjectResponse,
-    ProjectsResponse,
+    PropertyImagesResponse,
+    PropertyResponse,
+    PropertiesResponse,
     ScriptResponse,
     VideoResponse,
     VoiceResponse,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "Pedra",
@@ -35,9 +35,9 @@ __all__ = [
     "ScriptResponse",
     "VoiceResponse",
     "MusicLibraryResponse",
-    "ProjectsResponse",
-    "ProjectImagesResponse",
-    "ProjectResponse",
+    "PropertiesResponse",
+    "PropertyImagesResponse",
+    "PropertyResponse",
     "AddImagesResponse",
     "__version__",
 ]
