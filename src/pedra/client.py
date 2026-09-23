@@ -139,7 +139,11 @@ class Pedra:
         style: Optional[str] = None,
         creativity: Optional[str] = None,
     ) -> ImageResponse:
-        """Virtually stage / furnish a room."""
+        """Virtually stage / furnish a room.
+
+        ``creativity`` is deprecated and ignored by the API since September 2026:
+        there is one level, which keeps walls, doors, windows and the camera angle.
+        """
         return self._image(
             self._post(
                 "/furnish",
@@ -160,7 +164,11 @@ class Pedra:
         room_type: Optional[str] = None,
     ) -> ImageResponse:
         """Renovate a space. ``furnish`` accepts a bool or the explicit string
-        ("With furniture" / "Empty" / "Auto")."""
+        ("With furniture" / "Empty" / "Auto").
+
+        ``creativity`` is deprecated and ignored by the API since September 2026:
+        there is one level, which keeps walls, doors, windows and the camera angle.
+        """
         return self._image(
             self._post(
                 "/renovation",

@@ -68,8 +68,8 @@ class ImageResponse:
 | `enhance(image_url, *, preserve_original_framing=None)` | `/enhance` | `ImageResponse` |
 | `enhance_and_correct_perspective(image_url, *, preserve_original_framing=None)` | `/enhance_and_correct_perspective` | `ImageResponse` |
 | `empty(image_url)` | `/empty_room` | `ImageResponse` |
-| `furnish(image_url, *, room_type=None, style=None, creativity=None)` | `/furnish` | `ImageResponse` |
-| `renovation(image_url, *, style=None, creativity=None, furnish=None, room_type=None)` | `/renovation` | `ImageResponse` |
+| `furnish(image_url, *, room_type=None, style=None)` | `/furnish` | `ImageResponse` |
+| `renovation(image_url, *, style=None, furnish=None, room_type=None)` | `/renovation` | `ImageResponse` |
 | `edit_via_prompt(image_url, prompt)` | `/edit_via_prompt` | `ImageResponse` |
 | `sky(image_url, *, sky_style=None)` | `/sky_blue` | `ImageResponse` |
 | `remove(image_url, mask_url)` | `/remove_object` | `ImageResponse` |
@@ -95,8 +95,8 @@ pedra.enhance(image_url=url, preserve_original_framing=True)
 # Empty a room
 result = pedra.empty(url)
 
-# Renovate, furnished, high creativity
-pedra.renovation(url, style="Scandinavian", creativity="High", furnish=True)
+# Renovate, furnished
+pedra.renovation(url, style="Scandinavian", furnish=True)
 
 # Edit via prompt
 pedra.edit_via_prompt(url, "Add a large green plant in the corner")
