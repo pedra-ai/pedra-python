@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pedra"
-version = "0.3.0"
-description = "Official Python SDK for the Pedra API — AI photo editing for real estate (virtual staging, renovation, enhancement, video)."
+version = "0.4.0"
+description = "Official Python SDK for the Pedra API — AI photo editing for real estate (virtual staging, renovation, enhancement, video, 360° virtual tours)."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
@@ -21,6 +21,7 @@ keywords = [
     "ai",
     "image-editing",
     "real-estate-photography",
+    "virtual-tour",
     "sdk",
 ]
 classifiers = [
