@@ -187,8 +187,10 @@ video = pedra.create_video(
 print(video.video_url)
 ```
 
-Per-image `effect` is one of `zoom-in` (default), `zoom-out`, `transition`
-(requires `second_image_url`), or `static`. Each non-static image costs 5 credits.
+Per-image `effect` is one of `zoom-in` (default), `zoom-out`, `transition` or
+`sky-transition` (both require `second_image_url`), all AI and 5 credits each,
+or the free `lite-zoom-in` / `lite-zoom-out` (a subtler 3D push, no AI video)
+and `static`.
 
 ## Virtual tours
 
